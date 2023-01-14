@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <locale.h>
 #include <ncurses.h>
 #include <pthread.h>
 #include <signal.h>
@@ -9,8 +10,27 @@
 #include <time.h>
 #include <unistd.h>
 
+char *ayaya[] = {"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣬⡛⣿⣿⣿⣯⢻", "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢻⣿⣿⢟⣻⣿⣿⣿⣿⣿⣿⣮⡻⣿⣿⣧",
+                 "⣿⣿⣿⣿⣿⢻⣿⣿⣿⣿⣿⣿⣆⠻⡫⣢⠿⣿⣿⣿⣿⣿⣿⣿⣷⣜⢻⣿", "⣿⣿⡏⣿⣿⣨⣝⠿⣿⣿⣿⣿⣿⢕⠸⣛⣩⣥⣄⣩⢝⣛⡿⠿⣿⣿⣆⢝",
+                 "⣿⣿⢡⣸⣿⣏⣿⣿⣶⣯⣙⠫⢺⣿⣷⡈⣿⣿⣿⣿⡿⠿⢿⣟⣒⣋⣙⠊", "⣿⡏⡿⣛⣍⢿⣮⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿",
+                 "⣿⢱⣾⣿⣿⣿⣝⡮⡻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⣋⣻⣿⣿⣿⣿", "⢿⢸⣿⣿⣿⣿⣿⣿⣷⣽⣿⣿⣿⣿⣿⣿⣿⡕⣡⣴⣶⣿⣿⣿⡟⣿⣿⣿",
+                 "⣦⡸⣿⣿⣿⣿⣿⣿⡛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣿⣿⣿", "⢛⠷⡹⣿⠋⣉⣠⣤⣶⣶⣿⣿⣿⣿⣿⣿⡿⠿⢿⣿⣿⣿⣿⣿⣷⢹⣿⣿",
+                 "⣷⡝⣿⡞⣿⣿⣿⣿⣿⣿⣿⣿⡟⠋⠁⣠⣤⣤⣦⣽⣿⣿⣿⡿⠋⠘⣿⣿", "⣿⣿⡹⣿⡼⣿⣿⣿⣿⣿⣿⣿⣧⡰⣿⣿⣿⣿⣿⣹⡿⠟⠉⡀⠄⠄⢿⣿",
+                 "⣿⣿⣿⣽⣿⣼⣛⠿⠿⣿⣿⣿⣿⣿⣯⣿⠿⢟⣻⡽⢚⣤⡞⠄⠄⠄⢸⣿"};
+
+char *anime[] = {
+    "⠄⠄⠄⠄⠄⠄⠄⠄⢀⣠⣤⣤⣤⣤⣤⣤⣤⣤⣀⣀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄", "⠄⠄⠄⠄⠄⣠⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣄⠄⠄⠄⠄⠄⠄⠄",
+    "⠄⠄⠄⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠿⠿⠿⢿⣿⣿⣷⣄⠄⠄⠄⠄⠄", "⠄⠄⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⣠⣶⣶⣶⣶⣤⡉⠻⣿⣿⣷⣀⠄⠄⠄",
+    "⠄⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣼⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣿⣿⡆⠄⠄", "⠄⣿⡿⠟⠛⠛⠛⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠄",
+    "⠄⠁⣴⣾⣿⣿⣿⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢿⣿⡿⠛⠉⠉⣿⣿⣿⣧⠄", "⠄⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣏⣠⡼⠛⣁⣴⣶⣶⣿⣿⣿⡿⠄",
+    "⠄⠸⣿⣿⣿⣿⣿⣿⡟⢿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣤⣾⣿⣿⣿⣿⣿⣿⣿⡇⠄", "⠄⠄⠹⣿⣿⠟⠛⠛⠁⣀⣉⣿⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠄",
+    "⠄⠄⠄⠙⢫⣶⣶⣿⣿⣿⣿⣿⣿⠿⠋⣁⣤⣴⣶⣶⣦⡙⢿⣿⣿⣿⣿⠏⠄⠄", "⠄⠄⠄⠄⠄⢻⣿⣿⣿⣿⣿⣿⣯⠄⣾⣿⣿⣿⣿⡿⠿⠃⢸⣿⡿⠋⠄⠄⠄⠄",
+    "⠄⠄⠄⠄⠄⠘⢿⣿⣿⣿⣿⣿⣿⣦⡙⠛⣉⣡⣤⡴⠖⠄⠚⠋⠄⠄⠄⠄⠄⠄", "⠄⠄⠄⠄⠄⠄⠄⠙⠛⠛⠛⠛⠛⠛⠛⠒⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄",
+};
+
 volatile bool inMenu = false;
 pthread_t clock_tid;
+pthread_mutex_t mutex;
 char inTitle[100];
 
 WINDOW *win_todolist;
@@ -26,7 +46,7 @@ void print_centered(WINDOW *win, int start_row, char str[]) {
   int center_str = strlen(str) / 2;
   int adjusted_col = center_col - center_str;
 
-  mvwprintw(win, start_row, adjusted_col, str);
+  mvwprintw(win, start_row, adjusted_col, "%s", str);
 }
 
 void draw_window_main() {
@@ -66,11 +86,11 @@ void draw_window_main() {
     pthread_create(&clock_tid, NULL, clock_thread, win_clock);
   } else {
     pthread_cancel(clock_tid);
+    pthread_join(clock_tid, NULL);
   }
 }
 
 void draw_window_menu(char title[]) {
-  system("clear");
 
   clear();
   refresh();
@@ -98,6 +118,12 @@ void handle_winch(int sig) {
   doupdate();
 }
 
+void handle_int(int sig) {
+  endwin();
+
+  exit(1);
+}
+
 int len_col(WINDOW *win, char str[]) {
   int center_col = getmaxx(win) / 2;
   int center_str = strlen(str) / 2;
@@ -105,11 +131,10 @@ int len_col(WINDOW *win, char str[]) {
 }
 
 void *clock_thread(void *arg) {
-  while (1) {
-    if (inMenu) {
-      pthread_exit(NULL);
-      continue;
-    }
+  pthread_mutex_lock(&mutex);
+  while (!inMenu) {
+    pthread_mutex_unlock(&mutex);
+
     WINDOW *win = (WINDOW *)arg;
     start_color();
     use_default_colors();
@@ -148,6 +173,8 @@ void *clock_thread(void *arg) {
     wrefresh(win);
     sleep(1);
   }
+  pthread_mutex_unlock(&mutex);
+  pthread_exit(NULL);
   return NULL;
 }
 
@@ -157,6 +184,7 @@ int main() {
   noecho();
   curs_set(0);
   signal(SIGWINCH, handle_winch);
+  signal(SIGINT, handle_int);
 
   if (has_colors() == FALSE) {
     endwin();
@@ -166,10 +194,14 @@ int main() {
     start_color();
     use_default_colors();
     draw_window_main();
+    pthread_mutex_init(&mutex, NULL);
   }
 
-  char ch;
+  char ch = '\0';
   while (ch != 'q') {
+    // setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "en_US.UTF-8");
+
     ch = getch();
     switch (ch) {
     case 'a':
@@ -190,9 +222,6 @@ int main() {
       draw_window_menu(inTitle);
       wgetch(win_menu);
       break;
-    case 'q':
-      system("clear");
-      exit(1);
     default:
       draw_window_main();
       inMenu = false;
@@ -202,6 +231,22 @@ int main() {
     inMenu = false;
   }
 
+  inMenu = true;
+  strcpy(inTitle, "THANK YOU");
+  draw_window_menu(inTitle);
+  int center_col = getmaxx(win_menu) / 2;
+  int center_str = strlen(anime[0]) / 2;
+  int adjusted_col = center_str - center_col;
+  for (int i = 1; i <= 13; i++) {
+    mvwprintw(win_menu, i + (getmaxy(win_menu) - 13) / 2, adjusted_col,
+              anime[i - 1]);
+  }
+  print_centered(win_menu, getmaxy(win_menu) - 2, "press any key to continue");
+  refresh();
+  wrefresh(win_menu);
+  wgetch(win_menu);
+
+  pthread_mutex_destroy(&mutex);
   endwin();
 
   return 0;

@@ -55,3 +55,4 @@ dkms.conf
 .cph
 .vscode
 .DS_Store
+.temp
