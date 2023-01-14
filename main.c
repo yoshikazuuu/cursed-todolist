@@ -65,17 +65,16 @@ void draw_window_main() {
   wrefresh(win_calendar);
   wrefresh(win_clock);
 
-  int ret = pthread_kill(clock_tid, 0);
-  if (ret == ESRCH) {
-    pthread_create(&clock_tid, NULL, clock_thread, win_clock);
-  } else {
-    pthread_cancel(clock_tid);
-    pthread_join(clock_tid, NULL);
-  }
+  // int ret = pthread_kill(clock_tid, 0);
+  // if (ret == ESRCH) {
+  //   pthread_create(&clock_tid, NULL, clock_thread, win_clock);
+  // } else {
+  //   pthread_cancel(clock_tid);
+  //   pthread_join(clock_tid, NULL);
+  // }
 }
 
 void draw_window_menu(char title[]) {
-
   clear();
   refresh();
   int yMax, xMax;
@@ -145,7 +144,8 @@ void *clock_thread(void *arg) {
     strftime(date_string, sizeof(date_string), "%A, %B", time_info);
     strftime(time_string, sizeof(time_string), "%H:%M:%S", time_info);
 
-    sprintf(date_string, "%s %s", date_string, suffix);
+    strncat(date_string, " ", sizeof(date_string) - strlen(date_string) - 1);
+    strncat(date_string, suffix, sizeof(date_string) - strlen(date_string) - 1);
 
     wattron(win, COLOR_PAIR(1));
     mvwprintw(win, 2, len_col(win, date_string), "%s", date_string);
@@ -178,7 +178,7 @@ int main() {
     start_color();
     use_default_colors();
     draw_window_main();
-    pthread_mutex_init(&mutex, NULL);
+    // pthread_mutex_init(&mutex, NULL);
   }
 
   char ch = '\0';
@@ -228,7 +228,7 @@ int main() {
   wrefresh(win_menu);
   wgetch(win_menu);
 
-  pthread_mutex_destroy(&mutex);
+  // pthread_mutex_destroy(&mutex);
   endwin();
 
   return 0;
