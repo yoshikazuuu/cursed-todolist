@@ -23,9 +23,11 @@ void draw_window_main() {
   refresh();
 
   print_centered(win_todolist, 0, "TO DO LIST");
-  ui_list();
+  // ui_todo();
   print_centered(win_appointment, 0, "APPOINTMENT");
+  // ui_appointment();
   print_centered(win_calendar, 0, "CALENDAR");
+  // ui_calendar();
   print_centered(win_clock, 0, "CLOCK");
 
   wrefresh(win_todolist);

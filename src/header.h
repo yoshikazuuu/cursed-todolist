@@ -38,8 +38,8 @@ void add_todo();
 void remove_todo(int line);
 void show_todo();
 void ui_todo();
-void ui_appointment();
-void ui_calendar();
+// void ui_appointment();
+// void ui_calendar();
 
 // STRUCTS
 struct list {

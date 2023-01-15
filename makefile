@@ -9,7 +9,7 @@ BIN_DIR = bin
 SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 
-all: $(TARGET)
+$(shell mkdir $(BUILD_DIR))
 
 $(TARGET): $(OBJ_FILES)
 	echo Linking...
@@ -21,4 +21,4 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 
 .PHONY: clean
 clean:
-	rm -f $(BUILD_DIR)/*.o $(TARGET)
+	rm -rf $(BUILD_DIR) $(TARGET)

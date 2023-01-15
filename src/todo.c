@@ -51,7 +51,7 @@ void remove_todo(int line_number) {
   rename("../data/temp.txt", "../data/todolist.txt");
 }
 
-void ui_book() {
+void ui_todo() {
   char n;
   system("clear");
   printf("1. Add List\n");
@@ -88,5 +88,5 @@ void ui_book() {
   default:
     break;
   }
-  bruh();
+  ui_todo();
 }
