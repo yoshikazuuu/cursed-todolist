@@ -28,25 +28,25 @@ int main() {
     setlocale(LC_ALL, "en_US.UTF-8");
     alarm(1);
 
-    clock_thread(win_clock);
     ch = getch();
 
     switch (ch) {
     case 'a':
       inMenu = true;
-      strcpy(inTitle, "APPOINTMENT");
+      strcpy(inTitle, " APPOINTMENT ");
       draw_window_menu(inTitle);
       wgetch(win_menu);
       break;
     case 't':
       inMenu = true;
-      strcpy(inTitle, "TO DO LIST");
+      strcpy(inTitle, " TO DO LIST ");
       draw_window_menu(inTitle);
-      wgetch(win_menu);
+      ui_todo(win_menu, 3);
+      menu_todo(win_menu);
       break;
     case 'c':
       inMenu = true;
-      strcpy(inTitle, "CALENDAR");
+      strcpy(inTitle, " CALENDAR ");
       draw_window_menu(inTitle);
       wgetch(win_menu);
       break;
@@ -61,7 +61,7 @@ int main() {
 
   end_screen();
 
-  pthread_mutex_destroy(&mutex);
+  // pthread_mutex_destroy(&mutex);
   return 0;
 }
 
@@ -100,6 +100,7 @@ void *clock_thread(void *arg) {
   init_pair(1, COLOR_YELLOW, -1);
   init_pair(2, COLOR_GREEN, -1);
   init_pair(3, COLOR_CYAN, -1);
+  init_pair(4, COLOR_RED, -1);
   time_t current_time = time(NULL);
   struct tm *time_info = localtime(&current_time);
 
@@ -139,7 +140,7 @@ void *clock_thread(void *arg) {
   return NULL;
 }
 
-void ui_todo() {
+void ui_todo(WINDOW *win, int column) {
   struct list td;
 
   FILE *fp;
@@ -150,7 +151,7 @@ void ui_todo() {
     size_t len = strcspn(td.list, "\n");
     memset(td.list + len, 0, 1);
 
-    mvwprintw(win_todolist, line, 2, "%d. %s", line - 1, td.list);
+    mvwprintw(win, line, column, "%d. %s", line - 1, td.list);
     line++;
   }
 
@@ -194,33 +195,35 @@ void remove_todo(int line_number) {
   rename("../data/temp.txt", "../data/todolist.txt");
 }
 
-void menu_todo() {
-  char n;
-  system("clear");
-  printf("1. Add List\n");
-  printf("2. See List\n");
-  printf("3. Remove List\n");
-  n = getchar();
-  getchar();
+void menu_todo(WINDOW *win) {
+  char selection;
+  mvwprintw(win, yMax / MENU_SIZE - 7, 4, "%s", "1. Add Task");
+  mvwprintw(win, yMax / MENU_SIZE - 6, 4, "%s", "2. See Task");
+  mvwprintw(win, yMax / MENU_SIZE - 5, 4, "%s", "3. Remove Task");
+  mvwprintw(win, yMax / MENU_SIZE - 3, 4, "%s", "press 'q' to go back");
 
-  if (n == 'q')
+  wrefresh(win);
+
+  selection = wgetch(win);
+
+  if (selection == 'q')
     return;
 
-  switch (n) {
+  switch (selection) {
   case '1':
-    system("clear");
+    wclear(win);
     add_todo();
     break;
 
   case '2':
     system("clear");
-    ui_todo();
+    // ui_todo(win_todolist);
     getchar();
     break;
 
   case '3':
     system("clear");
-    ui_todo();
+    // ui_todo(win_todolist);
     int line;
     printf("\ndelete/check completed task :");
     scanf("%d", &line);
@@ -231,7 +234,7 @@ void menu_todo() {
   default:
     break;
   }
-  menu_todo();
+  menu_todo(win);
 }
 
 void ui_appointment() {
@@ -382,11 +385,24 @@ void ui_calendar() {
   wattroff(win_calendar, COLOR_PAIR(1));
 }
 
+void ui_legend(int yWin, int xWin) {
+  mvwprintw(win_legend, 1, xWin / 4 - 5, "%-16s", "q quit");
+  mvwprintw(win_legend, 2, xWin / 4 - 5, "%-16s", "t to-do-list");
+  mvwprintw(win_legend, 2, xWin - xWin / 4 - 8, "%-16s", "a appointment");
+  mvwprintw(win_legend, 1, xWin - xWin / 4 - 8, "%-16s", "c calendar");
+
+  wattron(win_legend, COLOR_PAIR(4));
+  mvwprintw(win_legend, 1, xWin / 4 - 5, "%-2s", "q");
+  mvwprintw(win_legend, 2, xWin / 4 - 5, "%-2s", "t");
+  mvwprintw(win_legend, 2, xWin - xWin / 4 - 8, "%-2s", "a");
+  mvwprintw(win_legend, 1, xWin - xWin / 4 - 8, "%-2s", "c");
+  wattroff(win_legend, COLOR_PAIR(4));
+}
+
 void draw_window_main() {
   clear();
   refresh();
 
-  int yMax, xMax;
   getmaxyx(stdscr, yMax, xMax);
 
   if (xMax % 2 != 0) {
@@ -399,27 +415,32 @@ void draw_window_main() {
   win_todolist = newwin(yMax - 20, xMax / 3, 0, 0);
   win_clock = newwin(5, xMax / 3, yMax - 20, 0);
   win_calendar = newwin(15, xMax / 3, yMax - 15, 0);
-  win_appointment = newwin(yMax, xMax - (xMax / 3) - 1, 0, xMax / 3 + 1);
+  win_appointment = newwin(yMax - 4, xMax - (xMax / 3) - 1, 0, xMax / 3 + 1);
+  win_legend = newwin(4, xMax - (xMax / 3) - 1, yMax - 4, xMax / 3 + 1);
 
   box(win_todolist, 0, 0);
   box(win_appointment, 0, 0);
   box(win_calendar, 0, 0);
   box(win_clock, 0, 0);
+  box(win_legend, 0, 0);
   refresh();
 
-  print_centered(win_todolist, 0, "TO DO LIST");
-  ui_todo();
-  // ui_todo();
-  print_centered(win_appointment, 0, "APPOINTMENT");
+  print_centered(win_todolist, 0, " TO DO LIST ");
+  ui_todo(win_todolist, 2);
+  print_centered(win_appointment, 0, " APPOINTMENT ");
   ui_appointment();
-  print_centered(win_calendar, 0, "CALENDAR");
+  print_centered(win_calendar, 0, " CALENDAR ");
   ui_calendar();
-  print_centered(win_clock, 0, "CLOCK");
+  print_centered(win_clock, 0, " CLOCK ");
+  clock_thread(win_clock);
+  print_centered(win_legend, 0, " LEGENDS ");
+  ui_legend(4, xMax - (xMax / 3) - 1);
 
   wrefresh(win_todolist);
   wrefresh(win_appointment);
   wrefresh(win_calendar);
   wrefresh(win_clock);
+  wrefresh(win_legend);
 
   // int ret = pthread_kill(clock_tid, 0);
   // if (ret == ESRCH) {
@@ -436,11 +457,9 @@ void draw_window_menu(char title[]) {
   int yMax, xMax;
   getmaxyx(stdscr, yMax, xMax);
 
-  double multiplier = 1.3;
-
-  win_menu = newwin(yMax / multiplier, xMax / multiplier,
-                    (yMax - (yMax / multiplier)) / 2,
-                    (xMax - (xMax / multiplier)) / 2 + 1);
+  win_menu = newwin(yMax / MENU_SIZE, xMax / MENU_SIZE,
+                    (yMax - (yMax / MENU_SIZE)) / 2,
+                    (xMax - (xMax / MENU_SIZE)) / 2 + 1);
   box(win_menu, 0, 0);
   print_centered(win_menu, 0, title);
   wrefresh(win_menu);
@@ -461,6 +480,8 @@ int len_col(WINDOW *win, char str[]) {
 }
 
 void end_screen() {
+  inMenu = true;
+
   int width, height;
   initscr();
   clear();
@@ -498,6 +519,5 @@ void end_screen() {
   getch();
   system("clear");
   printf("\e[?25h");
-  system("pause");
   system("stty sane");
 }

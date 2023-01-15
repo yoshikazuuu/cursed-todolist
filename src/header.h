@@ -20,8 +20,12 @@
 #define WHT "\x1B[37m"
 #define RESET "\x1B[0m"
 
+// SIZE
+#define MENU_SIZE 1.3
+
 // GLOBAL
 bool inMenu;
+int yMax, xMax;
 pthread_t clock_tid;
 pthread_mutex_t mutex;
 char inTitle[100];
@@ -35,6 +39,7 @@ WINDOW *win_appointment;
 WINDOW *win_calendar;
 WINDOW *win_clock;
 WINDOW *win_menu;
+WINDOW *win_legend;
 
 // MAIN SCREEN related
 void *clock_thread(void *arg);
@@ -51,10 +56,11 @@ void remove_enter(char str[]);
 // TO DO LIST related
 void add_todo();
 void remove_todo(int line);
-void ui_todo();
+void ui_todo(WINDOW *win, int column);
+void menu_todo(WINDOW *win);
 void ui_calendar();
 void ui_appointment();
-// void ui_calendar();
+void ui_legend(int yWin, int xWin);
 
 // STRUCTS
 struct list {
