@@ -56,6 +56,7 @@ src/appointment
 canvas.c
 canvas
 main
+tdl
 .cph
 .vscode
 .DS_Store

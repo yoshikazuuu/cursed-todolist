@@ -43,6 +43,7 @@ void draw_window_main();
 void draw_window_menu(char title[]);
 void handle_winch(int sig);
 void handle_int(int sig);
+void input_timeout(int sig);
 void end_screen();
 int len_col(WINDOW *win, char str[]);
 void remove_enter(char str[]);

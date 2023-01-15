@@ -1,5 +1,7 @@
 #include "header.h"
 
+char ch = '\0';
+
 int main() {
   initscr();
   cbreak();
@@ -7,6 +9,7 @@ int main() {
   curs_set(0);
   signal(SIGWINCH, handle_winch);
   signal(SIGINT, handle_int);
+  signal(SIGALRM, input_timeout);
 
   if (has_colors() == FALSE) {
     endwin();
@@ -17,15 +20,17 @@ int main() {
     use_default_colors();
     draw_window_main();
     inMenu = false;
-    pthread_mutex_init(&mutex, NULL);
+    // pthread_mutex_init(&mutex, NULL);
   }
 
-  char ch = '\0';
   while (ch != 'q') {
     // setlocale(LC_ALL, "");
     setlocale(LC_ALL, "en_US.UTF-8");
+    alarm(1);
 
+    clock_thread(win_clock);
     ch = getch();
+
     switch (ch) {
     case 'a':
       inMenu = true;
@@ -77,53 +82,60 @@ void handle_int(int sig) {
   exit(1);
 }
 
+void input_timeout(int sig) {
+  alarm(1);
+  clock_thread(win_clock);
+}
+
 void *clock_thread(void *arg) {
-  pthread_mutex_lock(&mutex);
-  while (!inMenu) {
-    pthread_mutex_unlock(&mutex);
+  // pthread_mutex_lock(&mutex);
+  // while (ch != 's') {
+  // pthread_mutex_unlock(&mutex);
+  if (inMenu)
+    return NULL;
 
-    WINDOW *win = (WINDOW *)arg;
-    start_color();
-    use_default_colors();
-    init_pair(1, COLOR_YELLOW, -1);
-    init_pair(2, COLOR_GREEN, -1);
-    init_pair(3, COLOR_CYAN, -1);
-    time_t current_time = time(NULL);
-    struct tm *time_info = localtime(&current_time);
+  WINDOW *win = (WINDOW *)arg;
+  start_color();
+  use_default_colors();
+  init_pair(1, COLOR_YELLOW, -1);
+  init_pair(2, COLOR_GREEN, -1);
+  init_pair(3, COLOR_CYAN, -1);
+  time_t current_time = time(NULL);
+  struct tm *time_info = localtime(&current_time);
 
-    int day = time_info->tm_mday;
-    char suffix[5];
+  int day = time_info->tm_mday;
+  char suffix[5];
 
-    if (day % 10 == 1 && day != 11) {
-      snprintf(suffix, 5, "%dst", day);
-    } else if (day % 10 == 2 && day != 12) {
-      snprintf(suffix, 5, "%dnd", day);
-    } else if (day % 10 == 3 && day != 13) {
-      snprintf(suffix, 5, "%drd", day);
-    } else {
-      snprintf(suffix, 5, "%dth", day);
-    }
-
-    char time_string[9];
-    char date_string[30];
-    strftime(date_string, sizeof(date_string), "%A, %B", time_info);
-    strftime(time_string, sizeof(time_string), "%H:%M:%S", time_info);
-
-    strncat(date_string, " ", sizeof(date_string) - strlen(date_string) - 1);
-    strncat(date_string, suffix, sizeof(date_string) - strlen(date_string) - 1);
-
-    // wattron(win, COLOR_PAIR(1));
-    // mvwprintw(win, 2, len_col(win, date_string), "%s", date_string);
-    // wattroff(win, COLOR_PAIR(1));
-    wattron(win, COLOR_PAIR(3));
-    mvwprintw(win, 2, len_col(win, time_string), "%s", time_string);
-    wattroff(win, COLOR_PAIR(3));
-    refresh();
-    wrefresh(win);
-    sleep(1);
+  if (day % 10 == 1 && day != 11) {
+    snprintf(suffix, 5, "%dst", day);
+  } else if (day % 10 == 2 && day != 12) {
+    snprintf(suffix, 5, "%dnd", day);
+  } else if (day % 10 == 3 && day != 13) {
+    snprintf(suffix, 5, "%drd", day);
+  } else {
+    snprintf(suffix, 5, "%dth", day);
   }
-  pthread_mutex_unlock(&mutex);
-  pthread_exit(NULL);
+
+  char time_string[9];
+  char date_string[30];
+  strftime(date_string, sizeof(date_string), "%A, %B", time_info);
+  strftime(time_string, sizeof(time_string), "%H:%M:%S", time_info);
+
+  strncat(date_string, " ", sizeof(date_string) - strlen(date_string) - 1);
+  strncat(date_string, suffix, sizeof(date_string) - strlen(date_string) - 1);
+
+  // wattron(win, COLOR_PAIR(1));
+  // mvwprintw(win, 2, len_col(win, date_string), "%s", date_string);
+  // wattroff(win, COLOR_PAIR(1));
+  wattron(win, COLOR_PAIR(3));
+  mvwprintw(win, 2, len_col(win, time_string), "%s", time_string);
+  wattroff(win, COLOR_PAIR(3));
+  refresh();
+  wrefresh(win);
+
+  // }
+  // pthread_mutex_unlock(&mutex);
+  // pthread_exit(NULL);
   return NULL;
 }
 
@@ -371,6 +383,9 @@ void ui_calendar() {
 }
 
 void draw_window_main() {
+  clear();
+  refresh();
+
   int yMax, xMax;
   getmaxyx(stdscr, yMax, xMax);
 
@@ -406,13 +421,13 @@ void draw_window_main() {
   wrefresh(win_calendar);
   wrefresh(win_clock);
 
-  int ret = pthread_kill(clock_tid, 0);
-  if (ret == ESRCH) {
-    pthread_create(&clock_tid, NULL, clock_thread, win_clock);
-  } else {
-    pthread_cancel(clock_tid);
-    pthread_join(clock_tid, NULL);
-  }
+  // int ret = pthread_kill(clock_tid, 0);
+  // if (ret == ESRCH) {
+  //   pthread_create(&clock_tid, NULL, clock_thread, win_clock);
+  // } else {
+  //   pthread_cancel(clock_tid);
+  //   pthread_join(clock_tid, NULL);
+  // }
 }
 
 void draw_window_menu(char title[]) {
