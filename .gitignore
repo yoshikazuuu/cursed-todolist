@@ -52,6 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Random Junk
+src/appointment
 canvas.c
 canvas
 main
