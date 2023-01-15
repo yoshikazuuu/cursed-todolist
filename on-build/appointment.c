@@ -11,6 +11,25 @@ struct Appointment {
   char *description;
 };
 
+int validateDate(struct tm date) {
+  if (date.tm_year < 1900 || date.tm_year > 9999) {
+    return 0;
+  }
+  if (date.tm_mon < 1 || date.tm_mon > 12) {
+    return 0;
+  }
+  if (date.tm_mday < 1 || date.tm_mday > 31) {
+    return 0;
+  }
+  if (date.tm_hour < 0 || date.tm_hour > 23) {
+    return 0;
+  }
+  if (date.tm_min < 0 || date.tm_min > 59) {
+    return 0;
+  }
+  return 1;
+}
+
 // create appointments.txt if don't exists
 void createAppointmentsFile() {
   FILE *appointments_file = fopen("appointments.txt", "r");
@@ -33,15 +52,28 @@ void createAppointment(struct Appointment *appointment) {
   scanf("%d-%d-%d %d:%d", &appointment->startTime.tm_year,
         &appointment->startTime.tm_mon, &appointment->startTime.tm_mday,
         &appointment->startTime.tm_hour, &appointment->startTime.tm_min);
-
   getchar();
+
+  if (!validateDate(appointment->startTime)) {
+    printf("Error: Invalid date\n");
+    return;
+  }
 
   printf("Enter end time (YYYY-MM-DD HH:MM): ");
   scanf("%d-%d-%d %d:%d", &appointment->endTime.tm_year,
         &appointment->endTime.tm_mon, &appointment->endTime.tm_mday,
         &appointment->endTime.tm_hour, &appointment->endTime.tm_min);
-
   getchar();
+
+  if (!validateDate(appointment->endTime)) {
+    printf("Error: Invalid date\n");
+    return;
+  }
+
+  if (mktime(&appointment->startTime) > mktime(&appointment->endTime)) {
+    printf("Error: End time must be after start time\n");
+    return;
+  }
 
   char *description = malloc(100);
   printf("Enter description: ");
