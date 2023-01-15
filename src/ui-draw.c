@@ -23,6 +23,7 @@ void draw_window_main() {
   refresh();
 
   print_centered(win_todolist, 0, "TO DO LIST");
+  ui_list();
   print_centered(win_appointment, 0, "APPOINTMENT");
   print_centered(win_calendar, 0, "CALENDAR");
   print_centered(win_clock, 0, "CLOCK");
