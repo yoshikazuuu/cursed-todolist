@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define __USE_XOPEN
 #include <time.h>
 #include <unistd.h>
 
@@ -141,7 +142,7 @@ void removeAppointment() {
   }
 
   char *line = malloc(100);
-  int line_number = 0;
+  int line_number = 1;
   while (fgets(line, 100, appointments_file) != NULL) {
     char *start_time = strtok(line, "~");
     char *end_time = strtok(NULL, "~");
@@ -165,7 +166,6 @@ void removeAppointment() {
     line_number++;
   }
   fclose(appointments_file);
-  free(line);
 
   printf("Enter the line number to remove: ");
   int line_to_remove;
@@ -183,7 +183,7 @@ void removeAppointment() {
     return;
   }
 
-  line_number = 0;
+  line_number = 1;
   while (fgets(line, 100, appointments_file) != NULL) {
     if (line_number != line_to_remove) {
       fprintf(new_appointments_file, "%s", line);
@@ -208,7 +208,7 @@ void updateAppointment() {
   }
 
   char *line = malloc(100);
-  int line_number = 0;
+  int line_number = 1;
   while (fgets(line, 100, appointments_file) != NULL) {
     char *start_time = strtok(line, "~");
     char *end_time = strtok(NULL, "~");
@@ -232,7 +232,6 @@ void updateAppointment() {
     line_number++;
   }
   fclose(appointments_file);
-  free(line);
 
   printf("Enter the line number to update: ");
   int line_to_update;
@@ -250,7 +249,7 @@ void updateAppointment() {
     return;
   }
 
-  line_number = 0;
+  line_number = 1;
   while (fgets(line, 100, appointments_file) != NULL) {
     if (line_number != line_to_update) {
       fprintf(new_appointments_file, "%s", line);
@@ -374,7 +373,7 @@ void menu() {
     system("clear");
     display_calendar();
     if (choice == 1) {
-      struct Appointment *appointment;
+      struct Appointment appointment;
       createAppointment(&appointment);
     } else if (choice == 2) {
       updateAppointment();
