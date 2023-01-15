@@ -10,8 +10,6 @@
 #include <time.h>
 #include <unistd.h>
 
-char ayaya[] = "TEHEEEE~~~~~~~~~~~~";
-
 volatile bool inMenu = false;
 pthread_t clock_tid;
 pthread_mutex_t mutex;
@@ -24,6 +22,12 @@ WINDOW *win_clock;
 WINDOW *win_menu;
 
 void *clock_thread(void *arg);
+void print_centered(WINDOW *win, int start_row, char str[]);
+void draw_window_main();
+void draw_window_menu(char title[]);
+void handle_winch(int sig);
+void handle_int(int sig);
+int len_col(WINDOW *win, char str[]);
 
 void print_centered(WINDOW *win, int start_row, char str[]) {
   int center_col = getmaxx(win) / 2;
@@ -110,7 +114,7 @@ void handle_int(int sig) {
 int len_col(WINDOW *win, char str[]) {
   int center_col = getmaxx(win) / 2;
   int center_str = strlen(str) / 2;
-  return center_col - center_str;
+  return abs(center_col - center_str);
 }
 
 void *clock_thread(void *arg) {
@@ -160,6 +164,48 @@ void *clock_thread(void *arg) {
   pthread_mutex_unlock(&mutex);
   pthread_exit(NULL);
   return NULL;
+}
+
+int end_screen() {
+  int width, height;
+  initscr();
+  clear();
+  refresh();
+  getmaxyx(stdscr, height, width);
+  endwin();
+  system("clear");
+  setvbuf(stdout, NULL, _IOLBF, 0);
+  setvbuf(stderr, NULL, _IONBF, 0);
+
+  char *ayaya[] = {
+      "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣬⡛⣿⣿⣿⣯⢻\n", "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢻⣿⣿⢟⣻⣿⣿⣿⣿⣿⣿⣮⡻⣿⣿⣧\n",
+      "⣿⣿⣿⣿⣿⢻⣿⣿⣿⣿⣿⣿⣆⠻⡫⣢⠿⣿⣿⣿⣿⣿⣿⣿⣷⣜⢻⣿\n", "⣿⣿⡏⣿⣿⣨⣝⠿⣿⣿⣿⣿⣿⢕⠸⣛⣩⣥⣄⣩⢝⣛⡿⠿⣿⣿⣆⢝\n",
+      "⣿⣿⢡⣸⣿⣏⣿⣿⣶⣯⣙⠫⢺⣿⣷⡈⣿⣿⣿⣿⡿⠿⢿⣟⣒⣋⣙⠊\n", "⣿⡏⡿⣛⣍⢿⣮⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿\n",
+      "⣿⢱⣾⣿⣿⣿⣝⡮⡻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⣋⣻⣿⣿⣿⣿\n", "⢿⢸⣿⣿⣿⣿⣿⣿⣷⣽⣿⣿⣿⣿⣿⣿⣿⡕⣡⣴⣶⣿⣿⣿⡟⣿⣿⣿\n",
+      "⣦⡸⣿⣿⣿⣿⣿⣿⡛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣿⣿⣿\n", "⢛⠷⡹⣿⠋⣉⣠⣤⣶⣶⣿⣿⣿⣿⣿⣿⡿⠿⢿⣿⣿⣿⣿⣿⣷⢹⣿⣿\n",
+      "⣷⡝⣿⡞⣿⣿⣿⣿⣿⣿⣿⣿⡟⠋⠁⣠⣤⣤⣦⣽⣿⣿⣿⡿⠋⠘⣿⣿\n", "⣿⣿⡹⣿⡼⣿⣿⣿⣿⣿⣿⣿⣧⡰⣿⣿⣿⣿⣿⣹⡿⠟⠉⡀⠄⠄⢿⣿\n",
+      "⣿⣿⣿⣽⣿⣼⣛⠿⠿⣿⣿⣿⣿⣿⣯⣿⠿⢟⣻⡽⢚⣤⡞⠄⠄⠄⢸⣿\n"};
+
+  // printf("\033[%d;%dH%s", (height / 2 + 2),
+  //        (width - strlen("press anything to continue\n") + 1) / 2,
+  //        "ありがとうございます\n");
+  printf("\033[%d;%dH%s", (height / 2 - 14),
+         (width - strlen("ありがとうございます！\n") + 14) / 2,
+         "ありがとうございます！\n");
+
+  for (int i = 12; 0 <= i; i--)
+    printf("\033[%d;%dH%s", (height / 2 - i), (width - 27) / 2, ayaya[12 - i]);
+
+  printf("\033[%d;%dH%s", (height / 2 + 2),
+         (width - strlen("⭐ AYAYA! ⭐\n") + 4) / 2, "⭐ AYAYA! ⭐\n");
+
+  printf("\033[%d;%dH%s", (height / 2 + 4),
+         (width - strlen("press anything to continue\n") + 2) / 2,
+         "press anything to continue\n");
+
+  getch();
+  system("clear");
+  system("stty sane");
 }
 
 int main() {
@@ -215,21 +261,8 @@ int main() {
     inMenu = false;
   }
 
-  inMenu = true;
-  strcpy(inTitle, "THANK YOU");
-  draw_window_menu(inTitle);
-  int center_col = getmaxx(win_menu) / 2;
-  int center_str = strlen(ayaya) / 2;
-  int adjusted_col = abs(center_str - center_col);
-  mvwprintw(win_menu, (getmaxy(win_menu) - 13) / 2, adjusted_col, "%s", ayaya);
-
-  print_centered(win_menu, getmaxy(win_menu) - 2, "press any key to continue");
-  refresh();
-  wrefresh(win_menu);
-  wgetch(win_menu);
+  end_screen();
 
   // pthread_mutex_destroy(&mutex);
-  endwin();
-
   return 0;
 }

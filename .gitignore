@@ -52,6 +52,9 @@ Mkfile.old
 dkms.conf
 
 # Random Junk
+canvas.c
+canvas
+main
 .cph
 .vscode
 .DS_Store
