@@ -8,7 +8,9 @@ void show_todo() {
 
   int line = 1;
   while (fgets(td.list, sizeof(td.list), fp)) {
-    printf("%d. %s", line++, td.list);
+    mvwprintw(win_todolist, line, 2, "%d. %s", line, td.list);
+    line++;
+    // wprintw(win_todolist, "%d. %s", line++, td.list);
   }
 
   fclose(fp);

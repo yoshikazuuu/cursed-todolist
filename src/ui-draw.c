@@ -23,7 +23,20 @@ void draw_window_main() {
   refresh();
 
   print_centered(win_todolist, 0, "TO DO LIST");
-  // ui_todo();
+  // show_todo();
+  // mvwprintw(win_todolist, 1, 2, "%s", "bruh");
+  struct list td;
+
+  FILE *fp;
+  fp = fopen("../data/todolist.txt", "r");
+
+  int line = 1;
+  while (fgets(td.list, sizeof(td.list), fp)) {
+    mvwprintw(win_todolist, line, 2, "%d. %s", line, td.list);
+    line++;
+    // wprintw(win_todolist, "%d. %s", line++, td.list);
+  }
+
   print_centered(win_appointment, 0, "APPOINTMENT");
   // ui_appointment();
   print_centered(win_calendar, 0, "CALENDAR");

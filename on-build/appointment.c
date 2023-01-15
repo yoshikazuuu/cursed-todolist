@@ -339,7 +339,7 @@ void display_calendar() {
   }
 
   for (int i = 0; i < first_day_of_month; i++) {
-    printf("   ");
+    printf("---");
   }
 
   for (int i = 1; i <= days_in_month[month]; i++) {
