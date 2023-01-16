@@ -1,6 +1,7 @@
 #include <curses.h>
 #include <errno.h>
 #include <locale.h>
+#include <math.h>
 #include <pthread.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -33,6 +34,20 @@ char *months[] = {"January",   "February", "March",    "April",
                   "May",       "June",     "July",     "August",
                   "September", "October",  "November", "December"};
 
+const char *month_name[12] = {"January",   "February", "March",    "April",
+                              "May",       "June",     "July",     "August",
+                              "September", "October",  "November", "December"};
+const char *day_names = "Su Mo Tu We Th Fr Sa";
+char *ayaya[] = {
+    WHT "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣬⡛⣿⣿⣿⣯⢻\n",  "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢻⣿⣿⢟⣻⣿⣿⣿⣿⣿⣿⣮⡻⣿⣿⣧\n",
+    "⣿⣿⣿⣿⣿⢻⣿⣿⣿⣿⣿⣿⣆⠻⡫⣢⠿⣿⣿⣿⣿⣿⣿⣿⣷⣜⢻⣿\n",      "⣿⣿⡏⣿⣿⣨⣝⠿⣿⣿⣿⣿⣿⢕⠸⣛⣩⣥⣄⣩⢝⣛⡿⠿⣿⣿⣆⢝\n",
+    "⣿⣿⢡⣸⣿⣏⣿⣿⣶⣯⣙⠫⢺⣿⣷⡈⣿⣿⣿⣿⡿⠿⢿⣟⣒⣋⣙⠊\n",      "⣿⡏⡿⣛⣍⢿⣮⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿\n",
+    "⣿⢱⣾⣿⣿⣿⣝⡮⡻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⣋⣻⣿⣿⣿⣿\n",      "⢿⢸⣿⣿⣿⣿⣿⣿⣷⣽⣿⣿⣿⣿⣿⣿⣿⡕⣡⣴⣶⣿⣿⣿⡟⣿⣿⣿\n",
+    "⣦⡸⣿⣿⣿⣿⣿⣿⡛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣿⣿⣿\n",      "⢛⠷⡹⣿⠋⣉⣠⣤⣶⣶⣿⣿⣿⣿⣿⣿⡿⠿⢿⣿⣿⣿⣿⣿⣷⢹⣿⣿\n",
+    "⣷⡝⣿⡞⣿⣿⣿⣿⣿⣿⣿⣿⡟⠋⠁⣠⣤⣤⣦⣽⣿⣿⣿⡿⠋⠘⣿⣿\n",      "⣿⣿⡹⣿⡼⣿⣿⣿⣿⣿⣿⣿⣧⡰⣿⣿⣿⣿⣿⣹⡿⠟⠉⡀⠄⠄⢿⣿\n",
+    "⣿⣿⣿⣽⣿⣼⣛⠿⠿⣿⣿⣿⣿⣿⣯⣿⠿⢟⣻⡽⢚⣤⡞⠄⠄⠄⢸⣿\n" RESET};
+int num_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
 // WINDOWS
 WINDOW *win_todolist;
 WINDOW *win_appointment;
@@ -46,6 +61,7 @@ void *clock_thread(void *arg);
 void print_centered(WINDOW *win, int start_row, char str[]);
 void draw_window_main();
 void draw_window_menu(char title[]);
+void draw_window_base(char title[]);
 void handle_winch(int sig);
 void handle_int(int sig);
 void input_timeout(int sig);
@@ -55,14 +71,25 @@ void remove_enter(char str[]);
 
 // TO DO LIST related
 void add_todo();
-void remove_todo(int line);
+void add_appointment();
+void update_appointment();
+void remove_line(int line, char dir[]);
 void ui_todo(WINDOW *win, int column);
 void menu_todo(WINDOW *win);
 void ui_calendar();
-void ui_appointment();
+void ui_appointment(WINDOW *win, int column);
 void ui_legend(int yWin, int xWin);
+int compare(const void *a, const void *b) {
+  return strcmp(*(char **)a, *(char **)b);
+}
 
 // STRUCTS
 struct list {
   char list[100];
+};
+
+struct Appointment {
+  struct tm startTime;
+  struct tm endTime;
+  char *description;
 };
