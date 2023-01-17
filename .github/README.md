@@ -16,7 +16,7 @@ cursed.h
 
 ## :skull: <samp>Information</samp>
 
-This is a calendar based appointment and todo-list, created using the low-level library ([ncurses.h](https://invisible-island.net/ncurses/announce.html))
+This is a calendar based appointment and todo-list, created using the low-level library ([ncurses.h](https://invisible-island.net/ncurses/announce.html)).
 
 <br>
 
@@ -37,16 +37,15 @@ This is a calendar based appointment and todo-list, created using the low-level 
 
 <br>
 
+## :page_with_curl: <samp>License</samp>
+
+This project under [GNU GENERAL PUBLIC LICENSE v3.0](https://github.com/yoshikazuuu/tubes-todolist/blob/main/LICENSE).
+
+<br>
+
 ## :busts_in_silhouette: <samp>Contributors</samp>
 
 <a href="https://github.com/Yoshikazuuu/tubes-todolist/graphs/contributors">
     <img src="https://contrib.rocks/image?repo=Yoshikazuuu/tubes-todolist"/>
 </a>
-
-<br>
-
-## :page_with_curl: <samp>License</samp>
-
-This project build under [GNU GENERAL PUBLIC LICENSE v3.0](https://github.com/yoshikazuuu/tubes-todolist/blob/main/LICENSE)
-
 </div>
