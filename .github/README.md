@@ -39,7 +39,7 @@ This is a calendar based appointment and todo-list, created using the low-level 
 
 ## :page_with_curl: <samp>License</samp>
 
-This project under [GNU GENERAL PUBLIC LICENSE v3.0](https://github.com/yoshikazuuu/tubes-todolist/blob/main/LICENSE).
+This project is under [GNU GENERAL PUBLIC LICENSE v3.0](https://github.com/yoshikazuuu/tubes-todolist/blob/main/LICENSE).
 
 <br>
 
