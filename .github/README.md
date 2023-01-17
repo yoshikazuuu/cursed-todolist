@@ -16,13 +16,14 @@ cursed.h
 
 ## :skull: <samp>Information</samp>
 
-this is a calendar based appointment and todo-list, created using the low-level library ([ncurses.h](https://invisible-island.net/ncurses/announce.html))
+This is a calendar based appointment and todo-list, created using the low-level library ([ncurses.h](https://invisible-island.net/ncurses/announce.html))
 
 <br>
 
 ## :wrench: <samp>Installation</samp>
 
 1. Download and build ncurses library on your system
+   > HOW? Don't be spoiled, use your search engine!
 2. Clone this repository
    ```sh
    git clone https://github.com/Yoshikazuuu/tubes-todolist.git
