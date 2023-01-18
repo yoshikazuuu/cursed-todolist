@@ -26,8 +26,8 @@ This is a calendar based appointment and todo-list, created using the low-level 
    > HOW? Don't be spoiled, use your search engine!
 2. Clone this repository
    ```sh
-   git clone https://github.com/Yoshikazuuu/tubes-todolist.git
-   cd tubes-todolist.git/src
+   git clone https://github.com/yoshikazuuu/cursed-todolist.git
+   cd cursed-todolist.git/src
    ```
 3. Compile the source code
    ```sh
@@ -39,13 +39,13 @@ This is a calendar based appointment and todo-list, created using the low-level 
 
 ## :page_with_curl: <samp>License</samp>
 
-This project is under [GNU GENERAL PUBLIC LICENSE v3.0](https://github.com/yoshikazuuu/tubes-todolist/blob/main/LICENSE).
+This project is under [GNU GENERAL PUBLIC LICENSE v3.0](https://github.com/yoshikazuuu/cursed-todolist/blob/main/LICENSE).
 
 <br>
 
 ## :busts_in_silhouette: <samp>Contributors</samp>
 
-<a href="https://github.com/Yoshikazuuu/tubes-todolist/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=Yoshikazuuu/tubes-todolist"/>
+<a href="https://github.com/Yoshikazuuu/cursed-todolist/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=Yoshikazuuu/cursed-todolist"/>
 </a>
 </div>
